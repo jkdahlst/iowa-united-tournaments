@@ -188,31 +188,38 @@
 
             // Populate Cards
             cardsContainer.innerHTML = data.map(t => {
+                // Map to actual JSON keys: Dates, Tournament, Location, Hotel, Registration
+                const dateVal = t.Dates || t.date || 'TBD';
+                const tourneyVal = t.Tournament || t.tournament || 'Tournament';
+                const locationVal = t.Location || t.location || 'Location TBD';
+                const hotelVal = t.Hotel || t.hotel || 'No Hotel Assigned';
+                const regVal = t.Registration || t.registration || 'Pending';
+
                 const tourneyDisplay = t.tournamentUrl 
-                    ? `<a href="${t.tournamentUrl}" target="_blank" class="text-blue-400 hover:underline font-bold">${t.tournament} <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1"></i></a>`
-                    : `<span class="text-white font-bold">${t.tournament || 'Tournament'}</span>`;
+                    ? `<a href="${t.tournamentUrl}" target="_blank" class="text-blue-400 hover:underline font-bold">${tourneyVal} <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1"></i></a>`
+                    : `<span class="text-white font-bold">${tourneyVal}</span>`;
 
                 const hotelDisplay = t.hotelUrl 
-                    ? `<a href="${t.hotelUrl}" target="_blank" class="text-emerald-400 hover:underline font-medium">${t.hotel} <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1"></i></a>`
-                    : `<span class="text-slate-200">${t.hotel || 'No Hotel Assigned'}</span>`;
+                    ? `<a href="${t.hotelUrl}" target="_blank" class="text-emerald-400 hover:underline font-medium">${hotelVal} <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1"></i></a>`
+                    : `<span class="text-slate-200">${hotelVal}</span>`;
 
                 const regDisplay = t.registrationUrl 
-                    ? `<a href="${t.registrationUrl}" target="_blank" class="text-blue-400 hover:underline font-semibold bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-700">${t.registration} <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1"></i></a>`
-                    : `<span class="text-slate-200 font-semibold bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-700">${t.registration || 'Pending'}</span>`;
+                    ? `<a href="${t.registrationUrl}" target="_blank" class="text-blue-400 hover:underline font-semibold bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-700">${regVal} <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1"></i></a>`
+                    : `<span class="text-slate-200 font-semibold bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-700">${regVal}</span>`;
 
                 return `
                     <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-4 sm:p-5 hover:border-slate-600 transition shadow-sm flex flex-col justify-between">
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                                    <i class="fa-regular fa-calendar mr-1.5"></i> ${t.date || 'TBD'}
+                                    <i class="fa-regular fa-calendar mr-1.5"></i> ${dateVal}
                                 </span>
                             </div>
                             <h3 class="text-base sm:text-lg mb-2">${tourneyDisplay}</h3>
                             <div class="space-y-2 text-xs text-slate-300 mt-4">
                                 <div class="flex items-center text-slate-400">
                                     <i class="fa-solid fa-location-dot w-5 text-blue-400 shrink-0"></i>
-                                    <span class="text-slate-200 truncate">${t.location || 'Location TBD'}</span>
+                                    <span class="text-slate-200 truncate">${locationVal}</span>
                                 </div>
                                 <div class="flex items-center text-slate-400">
                                     <i class="fa-solid fa-hotel w-5 text-emerald-400 shrink-0"></i>
@@ -230,23 +237,29 @@
 
             // Populate Table
             tableBody.innerHTML = data.map(t => {
+                const dateVal = t.Dates || t.date || '--';
+                const tourneyVal = t.Tournament || t.tournament || '--';
+                const locationVal = t.Location || t.location || '--';
+                const hotelVal = t.Hotel || t.hotel || '--';
+                const regVal = t.Registration || t.registration || '--';
+
                 const tourneyLink = t.tournamentUrl 
-                    ? `<a href="${t.tournamentUrl}" target="_blank" class="text-blue-400 hover:underline font-semibold">${t.tournament}</a>`
-                    : `<span class="font-semibold text-white">${t.tournament || '--'}</span>`;
+                    ? `<a href="${t.tournamentUrl}" target="_blank" class="text-blue-400 hover:underline font-semibold">${tourneyVal}</a>`
+                    : `<span class="font-semibold text-white">${tourneyVal}</span>`;
 
                 const hotelLink = t.hotelUrl 
-                    ? `<a href="${t.hotelUrl}" target="_blank" class="text-emerald-400 hover:underline">${t.hotel}</a>`
-                    : `<span>${t.hotel || '--'}</span>`;
+                    ? `<a href="${t.hotelUrl}" target="_blank" class="text-emerald-400 hover:underline">${hotelVal}</a>`
+                    : `<span>${hotelVal}</span>`;
 
                 const regLink = t.registrationUrl 
-                    ? `<a href="${t.registrationUrl}" target="_blank" class="text-blue-400 hover:underline font-medium">${t.registration}</a>`
-                    : `<span>${t.registration || '--'}</span>`;
+                    ? `<a href="${t.registrationUrl}" target="_blank" class="text-blue-400 hover:underline font-medium">${regVal}</a>`
+                    : `<span>${regVal}</span>`;
 
                 return `
                     <tr class="hover:bg-slate-700/30 transition">
-                        <td class="py-3 px-3 sm:px-4 font-medium text-blue-400 whitespace-nowrap">${t.date || '--'}</td>
+                        <td class="py-3 px-3 sm:px-4 font-medium text-blue-400 whitespace-nowrap">${dateVal}</td>
                         <td class="py-3 px-3 sm:px-4">${tourneyLink}</td>
-                        <td class="py-3 px-3 sm:px-4 text-slate-300 whitespace-nowrap">${t.location || '--'}</td>
+                        <td class="py-3 px-3 sm:px-4 text-slate-300 whitespace-nowrap">${locationVal}</td>
                         <td class="py-3 px-3 sm:px-4 text-slate-300">${hotelLink}</td>
                         <td class="py-3 px-3 sm:px-4 text-slate-300 whitespace-nowrap">${regLink}</td>
                     </tr>
