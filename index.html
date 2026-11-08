@@ -1,13 +1,261 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Iowa United 141E Tournaments</title>
-    <!-- Optional: Pass your apple-touch-icon right here on the redirect landing page too -->
-    <link rel="apple-touch-icon" href="https://i.ibb.co/7xknwRMS/Iowa-United-Icon.png">
-    <meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycbz9ihzAlZqpaoXYH2DSGp69McYJCO70tHpb-OfRsrnOuiVtta7dAgty3kB0EDX_PYGg/exec">
+    
+    <!-- Tailwind CSS for modern, responsive sports dashboard design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for clean sports icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e3a8a',
+                        secondary: '#3b82f6',
+                        accent: '#f59e0b',
+                        darkBg: '#0f172a'
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-    <p>Redirecting to Iowa United Tournaments...</p>
+<body class="bg-slate-900 text-slate-100 min-h-screen w-full overflow-x-hidden">
+
+    <!-- Top Header Navigation -->
+    <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 text-white p-2 sm:p-2.5 rounded-xl shadow-lg flex items-center justify-center">
+                    <i class="fa-solid fa-volleyball text-xl sm:text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-xl font-bold tracking-tight text-white">Iowa United 141E</h1>
+                    <p class="text-[11px] sm:text-xs text-slate-400">2027 Tournament Hub & Schedule</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button onclick="switchView('cards')" id="cardsBtn" class="px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 transition flex items-center space-x-1.5 sm:space-x-2">
+                    <i class="fa-solid fa-grid-2"></i><span>Cards</span>
+                </button>
+                <button onclick="switchView('table')" id="tableBtn" class="px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg bg-blue-600 text-white transition shadow flex items-center space-x-1.5 sm:space-x-2">
+                    <i class="fa-solid fa-table-list"></i><span>Table</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-xl mx-auto px-4 py-6 w-full box-border">
+
+        <!-- Filter & Search Bar -->
+        <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-3.5 sm:p-4 mb-6 sm:mb-8 w-full box-border shadow-sm">
+            <div class="relative w-full">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400"></i>
+                <input type="text" id="searchInput" oninput="filterTournaments()" placeholder="Search tournaments, cities, hotels..." class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition box-border">
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loadingIndicator" class="flex flex-col items-center justify-center py-20">
+            <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="text-slate-400 text-sm font-medium">Loading live tournament schedule from Google Sheet...</p>
+        </div>
+
+        <!-- Cards View Container -->
+        <div id="cardsView" class="w-full grid grid-cols-1 gap-4 sm:gap-6 hidden">
+            <!-- Dynamically populated -->
+        </div>
+
+        <!-- Table View Container -->
+        <div id="tableView" class="w-full max-w-full bg-slate-800/80 border border-slate-700/60 rounded-2xl shadow-sm overflow-hidden hidden">
+            <div class="overflow-x-auto w-full -webkit-overflow-scrolling-touch">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                    <thead>
+                        <tr class="bg-slate-900/60 border-b border-slate-700 text-slate-400 uppercase text-[10px] sm:text-xs tracking-wider">
+                            <th class="py-3 px-3 sm:px-4 font-semibold whitespace-nowrap">Dates</th>
+                            <th class="py-3 px-3 sm:px-4 font-semibold">Tournament</th>
+                            <th class="py-3 px-3 sm:px-4 font-semibold whitespace-nowrap">Location</th>
+                            <th class="py-3 px-3 sm:px-4 font-semibold">Hotel</th>
+                            <th class="py-3 px-3 sm:px-4 font-semibold whitespace-nowrap">Teams</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-700/60 text-slate-200">
+                        <!-- Dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-16 h-16 bg-slate-800 text-slate-500 rounded-full flex items-center justify-center text-2xl mb-4">
+                <i class="fa-solid fa-calendar-xmark"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-300">No tournaments found</h3>
+            <p class="text-sm text-slate-500 mt-1">Try adjusting your search query.</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 sm:mt-20 border-t border-slate-800 py-6 text-center text-xs text-slate-500 px-4">
+        <p>Iowa United 141E Volleyball Club &copy; 2027 &bull; Live Google Sheets Synchronization</p>
+    </footer>
+
+    <!-- Frontend Script communicating with Google Apps Script backend -->
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbz9ihzAlZqpaoXYH2DSGp69McYJCO70tHpb-OfRsrnOuiVtta7dAgty3kB0EDX_PYGg/exec';
+        
+        let allTournaments = [];
+        let currentView = 'cards';
+
+        function loadData() {
+            fetch(API_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Tournaments loaded successfully:", data);
+                    allTournaments = data;
+                    document.getElementById('loadingIndicator').classList.add('hidden');
+                    renderTournaments(data);
+                    switchView('cards');
+                })
+                .catch(error => {
+                    console.error("Failed to load tournaments:", error);
+                    document.getElementById('loadingIndicator').innerHTML = `
+                        <div class="text-red-400 mb-2"><i class="fa-solid fa-triangle-exclamation text-2xl"></i></div>
+                        <p class="text-red-300 text-sm font-medium">Failed to load schedule from Google Sheets.</p>
+                        <p class="text-slate-500 text-xs mt-1">${error.message || error}</p>
+                    `;
+                });
+        }
+        
+        function switchView(view) {
+            currentView = view;
+            const cardsView = document.getElementById('cardsView');
+            const tableView = document.getElementById('tableView');
+            const cardsBtn = document.getElementById('cardsBtn');
+            const tableBtn = document.getElementById('tableBtn');
+
+            if (view === 'cards') {
+                cardsView.classList.remove('hidden');
+                tableView.classList.add('hidden');
+                cardsBtn.className = "px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg bg-blue-600 text-white transition shadow flex items-center space-x-1.5 sm:space-x-2";
+                tableBtn.className = "px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 transition flex items-center space-x-1.5 sm:space-x-2";
+            } else {
+                cardsView.classList.add('hidden');
+                tableView.classList.remove('hidden');
+                tableBtn.className = "px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg bg-blue-600 text-white transition shadow flex items-center space-x-1.5 sm:space-x-2";
+                cardsBtn.className = "px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 transition flex items-center space-x-1.5 sm:space-x-2";
+            }
+        }
+
+        function filterTournaments() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+
+            const filtered = allTournaments.filter(t => {
+                const matchesQuery = Object.values(t).some(val => 
+                    String(val).toLowerCase().includes(query)
+                );
+                return matchesQuery;
+            });
+
+            renderTournaments(filtered);
+        }
+
+        function renderTournaments(data) {
+            const cardsContainer = document.getElementById('cardsView');
+            const tableBody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (!data || data.length === 0) {
+                cardsContainer.innerHTML = '';
+                tableBody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            // Populate Cards
+            cardsContainer.innerHTML = data.map(t => {
+                const tourneyDisplay = t.tournamentUrl 
+                    ? `<a href="${t.tournamentUrl}" target="_blank" class="text-blue-400 hover:underline font-bold">${t.tournament} <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1"></i></a>`
+                    : `<span class="text-white font-bold">${t.tournament || 'Tournament'}</span>`;
+
+                const hotelDisplay = t.hotelUrl 
+                    ? `<a href="${t.hotelUrl}" target="_blank" class="text-emerald-400 hover:underline font-medium">${t.hotel} <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1"></i></a>`
+                    : `<span class="text-slate-200">${t.hotel || 'No Hotel Assigned'}</span>`;
+
+                const regDisplay = t.registrationUrl 
+                    ? `<a href="${t.registrationUrl}" target="_blank" class="text-blue-400 hover:underline font-semibold bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-700">${t.registration} <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1"></i></a>`
+                    : `<span class="text-slate-200 font-semibold bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-700">${t.registration || 'Pending'}</span>`;
+
+                return `
+                    <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-4 sm:p-5 hover:border-slate-600 transition shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                    <i class="fa-regular fa-calendar mr-1.5"></i> ${t.date || 'TBD'}
+                                </span>
+                            </div>
+                            <h3 class="text-base sm:text-lg mb-2">${tourneyDisplay}</h3>
+                            <div class="space-y-2 text-xs text-slate-300 mt-4">
+                                <div class="flex items-center text-slate-400">
+                                    <i class="fa-solid fa-location-dot w-5 text-blue-400 shrink-0"></i>
+                                    <span class="text-slate-200 truncate">${t.location || 'Location TBD'}</span>
+                                </div>
+                                <div class="flex items-center text-slate-400">
+                                    <i class="fa-solid fa-hotel w-5 text-emerald-400 shrink-0"></i>
+                                    <span class="truncate">${hotelDisplay}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs">
+                            <span class="text-slate-400 font-medium">Teams:</span>
+                            <div>${regDisplay}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Populate Table
+            tableBody.innerHTML = data.map(t => {
+                const tourneyLink = t.tournamentUrl 
+                    ? `<a href="${t.tournamentUrl}" target="_blank" class="text-blue-400 hover:underline font-semibold">${t.tournament}</a>`
+                    : `<span class="font-semibold text-white">${t.tournament || '--'}</span>`;
+
+                const hotelLink = t.hotelUrl 
+                    ? `<a href="${t.hotelUrl}" target="_blank" class="text-emerald-400 hover:underline">${t.hotel}</a>`
+                    : `<span>${t.hotel || '--'}</span>`;
+
+                const regLink = t.registrationUrl 
+                    ? `<a href="${t.registrationUrl}" target="_blank" class="text-blue-400 hover:underline font-medium">${t.registration}</a>`
+                    : `<span>${t.registration || '--'}</span>`;
+
+                return `
+                    <tr class="hover:bg-slate-700/30 transition">
+                        <td class="py-3 px-3 sm:px-4 font-medium text-blue-400 whitespace-nowrap">${t.date || '--'}</td>
+                        <td class="py-3 px-3 sm:px-4">${tourneyLink}</td>
+                        <td class="py-3 px-3 sm:px-4 text-slate-300 whitespace-nowrap">${t.location || '--'}</td>
+                        <td class="py-3 px-3 sm:px-4 text-slate-300">${hotelLink}</td>
+                        <td class="py-3 px-3 sm:px-4 text-slate-300 whitespace-nowrap">${regLink}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Initialize load on page startup
+        window.onload = loadData;
+    </script>
 </body>
 </html>
